@@ -1,0 +1,12 @@
+- name: Update apt cache
+  ansible.builtin.apt:
+      update_cache: yes
+
+- name: Install basic packages
+  ansible.builtin.apt:
+      name: '{{ packages }}'
+      state: present
+
+- name: Set timezone
+  ansible.builtin.timezone:
+      name: '{{ timezone }}'

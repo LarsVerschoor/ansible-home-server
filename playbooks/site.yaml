@@ -1,0 +1,7 @@
+- name: Configure Servers
+  hosts: all
+  become: true
+  roles:
+    - common
+    - docker
+    - k3s
