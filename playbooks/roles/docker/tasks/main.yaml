@@ -20,8 +20,10 @@
 
 - name: Install Docker
   ansible.builtin.apt:
-      name: docker-ce
-      state: latest
+      name:
+          - docker.io
+          - docker-compose-plugin
+      state: present
       update_cache: yes
 
 - name: Ensure Docker service is running
