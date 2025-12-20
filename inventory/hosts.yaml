@@ -1,6 +1,6 @@
 all:
   hosts:
     nuc:
-      ansible_host: nuc-server
+      ansible_host: nuc-server.home
       ansible_user: larsv
       ansible_python_interpreter: /usr/bin/python3
