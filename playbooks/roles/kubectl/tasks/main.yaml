@@ -9,14 +9,14 @@
   become: yes
 
 - name: Download the latest kubectl lsb-release
-  uri:
+  ansible.builtin.get_url:
       url: https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl
       dest: /opt/kubectl-{{ kubectl_version }}
   register: kubectl
   become: yes
 
 - name: Download the kubectl checksum
-  uri:
+  ansible.builtin.get_url:
       url: https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl.sha256
       dest: /opt/kubectl-{{ kubectl_version }}
   register: kubectl
