@@ -1,3 +1,6 @@
+# - set_fact:
+#     kubectl_version: "{{ version.content | trim }}"
+
 - name: Get latest kubectl version
   uri:
       url: https://dl.k8s.io/release/stable.txt
@@ -6,26 +9,26 @@
 
 - name: Create kubectl versioned directory
   file:
-      path: /opt/kubectl-{{ version.content }}
+      path: /opt/kubectl-{{ version.content | trim }}
       state: directory
   become: yes
 
 - name: Download the latest kubectl lsb-release
   uri:
-      url: https://dl.k8s.io/release/{{ version.content }}/bin/linux/amd64/kubectl
-      dest: /opt/kubectl-{{ version.content }}
+      url: https://dl.k8s.io/release/{{ version.content | trim }}/bin/linux/amd64/kubectl
+      dest: /opt/kubectl-{{ version.content | trim }}
   register: kubectl
   become: yes
 
 - name: Download the kubectl checksum
   uri:
-      url: https://dl.k8s.io/release/{{ version.content }}/bin/linux/amd64/kubectl.sha256
-      dest: /opt/kubectl-{{ version.content }}
+      url: https://dl.k8s.io/release/{{ version.content | trim }}/bin/linux/amd64/kubectl.sha256
+      dest: /opt/kubectl-{{ version.content | trim }}
   register: kubectl
   become: yes
 
 - name: Get kubectl sha256sum
-  shell: sha256sum /opt/kubectl-{{ version.content }}/kubectl | cut -d " " -f1
+  shell: sha256sum /opt/kubectl-{{ version.content | trim }}/kubectl | cut -d " " -f1
   register: file_shasum
 
 - set_fact: shasum1={{ file_shasum.stdout }}
@@ -34,7 +37,7 @@
   run_once: yes
 
 - name: Get sha256sum value from file
-  command: cat /opt/kubectl-{{ version.content }}/kubectl.sha256
+  command: cat /opt/kubectl-{{ version.content | trim }}/kubectl.sha256
   register: downloaded_shasum
 
 - set_fact: shasum2={{ downloaded_shasum.stdout }}
@@ -51,13 +54,13 @@
 
 - name: Change kubectl file permission
   file:
-      path: '/opt/kubectl-{{ version.content }}/kubectl'
+      path: '/opt/kubectl-{{ version.content | trim }}/kubectl'
       mode: '0755'
   become: true
 
 - name: create a symlink to kubectl
   file:
-      src: '/opt/kubectl-{{ version.content }}/kubectl'
+      src: '/opt/kubectl-{{ version.content | trim }}/kubectl'
       dest: '/usr/bin/kubectl'
       state: link
   become: true
