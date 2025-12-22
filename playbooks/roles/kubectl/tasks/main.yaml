@@ -1,15 +1,6 @@
-# - set_fact:
-#     kubectl_version: "{{ version.content | trim }}"
-
-- name: Get latest kubectl version
-  ansible.builtin.uri:
-      url: https://dl.k8s.io/release/stable.txt
-      return_content: yes
-  register: version
-
 - name: Set kubectl version variable
   set_fact:
-      kubectl_version: '{{ version.text | trim }}'
+      kubectl_version: "{{ lookup('url', 'https://dl.k8s.io/release/stable.txt') | trim }}"
 
 - name: Create kubectl versioned directory
   file:
