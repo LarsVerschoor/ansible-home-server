@@ -2,33 +2,37 @@
 #     kubectl_version: "{{ version.content | trim }}"
 
 - name: Get latest kubectl version
-  uri:
+  ansible.builtin.uri:
       url: https://dl.k8s.io/release/stable.txt
       return_content: yes
   register: version
 
+- name: Set kubectl version variable
+  set_fact:
+      kubectl_version: '{{ version.text | trim }}'
+
 - name: Create kubectl versioned directory
   file:
-      path: /opt/kubectl-{{ version.content | trim }}
+      path: /opt/kubectl-{{ kubectl_version }}
       state: directory
   become: yes
 
 - name: Download the latest kubectl lsb-release
   uri:
-      url: https://dl.k8s.io/release/{{ version.content | trim }}/bin/linux/amd64/kubectl
-      dest: /opt/kubectl-{{ version.content | trim }}
+      url: https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl
+      dest: /opt/kubectl-{{ kubectl_version }}
   register: kubectl
   become: yes
 
 - name: Download the kubectl checksum
   uri:
-      url: https://dl.k8s.io/release/{{ version.content | trim }}/bin/linux/amd64/kubectl.sha256
-      dest: /opt/kubectl-{{ version.content | trim }}
+      url: https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl.sha256
+      dest: /opt/kubectl-{{ kubectl_version }}
   register: kubectl
   become: yes
 
 - name: Get kubectl sha256sum
-  shell: sha256sum /opt/kubectl-{{ version.content | trim }}/kubectl | cut -d " " -f1
+  shell: sha256sum /opt/kubectl-{{ kubectl_version }}/kubectl | cut -d " " -f1
   register: file_shasum
 
 - set_fact: shasum1={{ file_shasum.stdout }}
@@ -37,7 +41,7 @@
   run_once: yes
 
 - name: Get sha256sum value from file
-  command: cat /opt/kubectl-{{ version.content | trim }}/kubectl.sha256
+  command: cat /opt/kubectl-{{ kubectl_version }}/kubectl.sha256
   register: downloaded_shasum
 
 - set_fact: shasum2={{ downloaded_shasum.stdout }}
@@ -54,13 +58,13 @@
 
 - name: Change kubectl file permission
   file:
-      path: '/opt/kubectl-{{ version.content | trim }}/kubectl'
+      path: '/opt/kubectl-{{ kubectl_version }}/kubectl'
       mode: '0755'
   become: true
 
 - name: create a symlink to kubectl
   file:
-      src: '/opt/kubectl-{{ version.content | trim }}/kubectl'
+      src: '/opt/kubectl-{{ kubectl_version }}/kubectl'
       dest: '/usr/bin/kubectl'
       state: link
   become: true
