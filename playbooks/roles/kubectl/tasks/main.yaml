@@ -10,18 +10,17 @@
   become: yes
 
 - name: Download kubectl binary
-  ansible.builtin.get_url:
+  get_url:
       url: https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl
       dest: /opt/kubectl-{{ kubectl_version }}/kubectl
       mode: '0755'
-  register: kubectl
   become: yes
 
 - name: Download kubectl checksum
-  ansible.builtin.get_url:
+  get_url:
       url: https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl.sha256
       dest: /opt/kubectl-{{ kubectl_version }}
-  register: kubectl
+      mode: '0755'
   become: yes
 
 - name: Get kubectl sha256sum
