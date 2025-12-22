@@ -1,56 +1,27 @@
-- name: Set kubectl version variable
-  set_fact:
-      kubectl_version: "{{ lookup('url', 'https://dl.k8s.io/release/stable.txt') | trim }}"
-
-- name: Create kubectl versioned directory
-  file:
-      path: /opt/kubectl-{{ kubectl_version }}/
-      state: directory
-      mode: '0755'
+- name: Install curl
+  package:
+      name: curl
+      state: present
   become: yes
 
-- name: Download kubectl binary
-  get_url:
-      url: https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl
-      dest: /opt/kubectl-{{ kubectl_version }}/kubectl/
-      mode: '0755'
+- name: Install k3s
+  shell: |
+      curl -sfL https://get.k3s.io | sh -
+  args:
+      creates: /usr/local/bin/k3s
   become: yes
 
-- name: Download kubectl checksum
-  get_url:
-      url: https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl.sha256
-      dest: /opt/kubectl-{{ kubectl_version }}
-      mode: '0755'
+- name: Ensure k3s service is running
+  systemd:
+      name: k3s
+      state: started
+      enabled: yes
   become: yes
 
-- name: Get kubectl sha256sum
-  shell: sha256sum /opt/kubectl-{{ kubectl_version }}/kubectl | cut -d " " -f1
-  register: file_shasum
+- name: Display cluster info
+  command: k3s kubectl get nodes
+  register: k3s_nodes
 
-- set_fact: shasum1={{ file_shasum.stdout }}
-
-- debug: var=shasum1
-  run_once: yes
-
-- name: Get sha256sum value from file
-  command: cat /opt/kubectl-{{ kubectl_version }}/kubectl.sha256
-  register: downloaded_shasum
-
-- set_fact: shasum2={{ downloaded_shasum.stdout }}
-
-- debug: var=shasum2
-  run_once: true
-
-- name: Assert that the kubectl binary is OK
-  assert:
-      that:
-          - file_shasum.stdout == downloaded_shasum.stdout
-      fail_msg: 'Shasum does not correspond'
-      success_msg: 'kubectl shasum verified: ok'
-
-- name: create a symlink to kubectl
-  file:
-      src: '/opt/kubectl-{{ kubectl_version }}/kubectl'
-      dest: '/usr/bin/kubectl'
-      state: link
-  become: true
+- name: Show nodes
+  debug:
+      msg: '{{ k3s_nodes.stdout }}'
