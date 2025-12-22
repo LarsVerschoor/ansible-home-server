@@ -2,6 +2,6 @@
   hosts: all
   become: true
   roles:
-    - common
-    - docker
-    - k3s
+      - common
+      - k3s
+      - kubectl
