@@ -12,7 +12,7 @@
       path: /usr/local/bin/k3s
   register: k3s_installed
 
-# Download K3s install script if not present
+# Download the K3s install script if not present
 - name: Download K3s installation script
   ansible.builtin.get_url:
       url: https://get.k3s.io
@@ -20,7 +20,7 @@
       mode: '0755'
   when: not k3s_installed.stat.exists
 
-# Install initial master (run once)
+# Install Initial Master (single-node)
 - name: Install K3s initial master
   ansible.builtin.shell: |
       sh /tmp/k3s_install.sh \
@@ -29,41 +29,5 @@
         --flannel-backend=vxlan
   args:
       executable: /bin/bash
-  when: node_type | default('undefined') == 'k3s_initial_master' and not k3s_installed.stat.exists
+  when: node_type == 'k3s_initial_master' and not k3s_installed.stat.exists
   run_once: true
-
-# Read node token from initial master (run once)
-- name: Read K3s node token from initial master
-  ansible.builtin.shell: cat /var/lib/rancher/k3s/server/node-token
-  register: k3s_node_token
-  no_log: true
-  run_once: true
-  when: node_type | default('undefined') != 'k3s_initial_master'
-
-# Share the token as a fact with all hosts
-- name: Set K3s token as fact
-  set_fact:
-      k3s_token: '{{ k3s_node_token.stdout }}'
-  run_once: true
-
-# Install additional master nodes
-- name: Install K3s master nodes
-  ansible.builtin.shell: |
-      sh /tmp/k3s_install.sh \
-        --token {{ k3s_token }} \
-        --server https://{{ hostvars['nuc'].ansible_default_ipv4.address }}:6443 \
-        --disable=traefik \
-        --flannel-backend=vxlan
-  args:
-      executable: /bin/bash
-  when: node_type | default('undefined') == 'k3s_master' and not k3s_installed.stat.exists
-
-# Install worker nodes
-- name: Install K3s worker nodes
-  ansible.builtin.shell: |
-      sh /tmp/k3s_install.sh agent \
-        --token {{ k3s_token }} \
-        --server https://{{ hostvars['nuc'].ansible_default_ipv4.address }}:6443
-  args:
-      executable: /bin/bash
-  when: node_type | default('undefined') == 'k3s_worker' and not k3s_installed.stat.exists
