@@ -4,7 +4,7 @@
 
 - name: Create kubectl versioned directory
   file:
-      path: /opt/kubectl-{{ kubectl_version }}
+      path: /opt/kubectl-{{ kubectl_version }}/
       state: directory
       mode: '0755'
   become: yes
@@ -12,7 +12,7 @@
 - name: Download kubectl binary
   get_url:
       url: https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl
-      dest: /opt/kubectl-{{ kubectl_version }}/kubectl
+      dest: /opt/kubectl-{{ kubectl_version }}/kubectl/
       mode: '0755'
   become: yes
 
