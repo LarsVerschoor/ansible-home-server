@@ -1,54 +1,64 @@
-- name: Install K3S Requirements
+# Install basic dependencies
+- name: Install K3s Requirements
   ansible.builtin.apt:
       update_cache: true
       pkg:
           - policycoreutils
       state: present
 
-# To make sure the the role is idempotent. The tasks after this will only be executed if K3S hasn't been installed already.
+# Check if K3s is already installed
 - name: Check if K3S is already installed
-  ansible.builtin.shell:
-      cmd: 'test -f /usr/local/bin/k3s'
+  ansible.builtin.stat:
+      path: /usr/local/bin/k3s
   register: k3s_installed
-  failed_when: false
 
+# Download the K3s install script (only if not installed)
 - name: Download K3s installation script
-  ansible.builtin.uri:
-      url: 'https://get.k3s.io'
-      method: GET
-      return_content: yes
-      dest: '/tmp/k3s_install.sh'
-  when: k3s_installed.rc != 0
+  ansible.builtin.get_url:
+      url: https://get.k3s.io
+      dest: /tmp/k3s_install.sh
+      mode: '0755'
+  when: not k3s_installed.stat.exists
 
-- name: Import K3S Token
-  ansible.builtin.include_vars:
-      file: k3s-secrets.yml.vault
-  when: k3s_installed.rc != 0
-
-# Note that the node_type variable is set in the inventory file
-- name: Execute K3s installation script [Initial Master Node]
-  ansible.builtin.shell:
-      cmd: 'sh /tmp/k3s_install.sh --token {{ k3s_token }} --disable=traefik --flannel-backend=vxlan --cluster-init'
-  vars:
-      k3s_token: '{{ k3s_token }}'
+# Install Initial Master (cluster-init)
+- name: Install K3s initial master
+  ansible.builtin.shell: |
+      sh /tmp/k3s_install.sh \
+        --cluster-init \
+        --disable=traefik \
+        --flannel-backend=vxlan
   args:
       executable: /bin/bash
-  when: node_type | default('undefined') == 'k3s_initial_master' and k3s_installed.rc != 0
+  when: node_type | default('undefined') == 'k3s_initial_master' and not k3s_installed.stat.exists
 
-- name: Execute K3s installation script [Master Nodes]
-  ansible.builtin.shell:
-      cmd: 'sh /tmp/k3s_install.sh --token {{ k3s_token }} --disable=traefik --flannel-backend=vxlan --server https://{{ hostvars["k3s-m1"]["ansible_default_ipv4"]["address"] }}:6443'
-  vars:
-      k3s_token: '{{ k3s_token }}'
+# Read node token from initial master (only once)
+- name: Read K3s node token from initial master
+  ansible.builtin.slurp:
+      src: /var/lib/rancher/k3s/server/node-token
+  register: k3s_node_token
+  delegate_to: k3s-m1
+  run_once: true
+  no_log: true # prevents token from appearing in logs
+  when: node_type | default('undefined') != 'k3s_initial_master'
+
+# Install additional master nodes
+- name: Install K3s master nodes
+  ansible.builtin.shell: |
+      sh /tmp/k3s_install.sh \
+        --token {{ k3s_node_token.content | b64decode | trim }} \
+        --server https://{{ hostvars['k3s-m1'].ansible_default_ipv4.address }}:6443 \
+        --disable=traefik \
+        --flannel-backend=vxlan
   args:
       executable: /bin/bash
-  when: node_type | default('undefined') == 'k3s_master' and k3s_installed.rc != 0
+  when: node_type | default('undefined') == 'k3s_master' and not k3s_installed.stat.exists
 
-- name: Execute K3s installation script [Worker Nodes]
-  ansible.builtin.shell:
-      cmd: 'sh /tmp/k3s_install.sh agent --token {{ k3s_token }} --server https://{{ hostvars["k3s-m1"]["ansible_default_ipv4"]["address"] }}:6443'
-  vars:
-      k3s_token: '{{ k3s_token }}'
+# Install worker nodes
+- name: Install K3s worker nodes
+  ansible.builtin.shell: |
+      sh /tmp/k3s_install.sh agent \
+        --token {{ k3s_node_token.content | b64decode | trim }} \
+        --server https://{{ hostvars['k3s-m1'].ansible_default_ipv4.address }}:6443
   args:
       executable: /bin/bash
-  when: node_type | default('undefined') == 'k3s_worker' and k3s_installed.rc != 0
+  when: node_type | default('undefined') == 'k3s_worker' and not k3s_installed.stat.exists
