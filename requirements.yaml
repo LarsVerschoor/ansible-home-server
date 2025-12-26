@@ -1,0 +1,4 @@
+collections:
+  # Provides the ufw module and other POSIX utilities
+  - name: ansible.posix
+    version: '>=1.6.1'
