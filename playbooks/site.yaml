@@ -1,7 +1,5 @@
-- name: Configure Servers
-  hosts: all
+- name: Configure K3s Cluster
+  hosts: servers
   become: true
   roles:
-      - common
-      - k3s
-      - kubectl
+    - k3s-server-node-test

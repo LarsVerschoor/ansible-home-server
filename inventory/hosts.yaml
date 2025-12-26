@@ -1,7 +1,10 @@
 all:
-    hosts:
-        nuc:
-            ansible_host: nuc-server.home
-            node_type: k3s_initial_master
-            ansible_user: larsv
-            ansible_python_interpreter: /usr/bin/python3
+  children:
+    k3s_cluster:
+      children:
+        servers:
+          hosts:
+            intel_nuc_1:
+              ansible_host: nuc-server.home
+              ansible_user: larsv
+              ansible_python_interpreter: /usr/bin/python3
