@@ -1,3 +1,4 @@
-- name: Disable ufw firewall
-  shell: ufw disable
+- name: Ensure ufw is disabled
+  ansible.posix.ufw:
+    state: disabled
   become: true
