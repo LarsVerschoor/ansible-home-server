@@ -1,6 +1,4 @@
-- name: Ensure ufw is disabled
-  shell: ufw disable
-  args:
-    warn: false
+- name: Ensure UFW is disabled
+  ansible.posix.ufw:
+    state: disabled
   become: true
-  when: ansible_facts['ufw']['status'] != 'inactive'
