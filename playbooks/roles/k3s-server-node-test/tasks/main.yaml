@@ -22,6 +22,15 @@
   args:
     creates: /usr/local/bin/k3s
 
+- name: Create .kube directory on user home directory
+  ansible.builtin.file:
+    path: /home/{{ ansible_user }}/.kube
+    state: directory
+    owner: '{{ ansible_user }}'
+    group: '{{ ansible_user }}'
+    mode: '0700'
+  become: true
+
 - name: Copy kubeconfig to user home directory
   ansible.builtin.copy:
     src: /etc/rancher/k3s/k3s.yaml
