@@ -8,11 +8,15 @@
     name: curl
     state: present
 
-- name: Disable swap
-  ansible.builtin.shell: |
-    swapoff -a
-    sed -i '/ swap / s/^/#/' /etc/fstab
-  become: true
+- name: Disable swap at runtime
+  ansible.builtin.command: swapoff -a
+  when: ansible_swaptotal_mb | int > 0
+
+- name: Disable swap permanently
+  ansible.builtin.mount:
+    name: swap
+    fstype: swap
+    state: absent
 
 - name: Install K3s Server
   ansible.builtin.shell: curl -sfL https://get.k3s.io | sh -s -
