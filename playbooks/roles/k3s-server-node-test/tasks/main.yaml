@@ -21,3 +21,12 @@
     K3S_TOKEN: '{{ k3s_token }}'
   args:
     creates: /usr/local/bin/k3s
+
+- name: Copy kubeconfig to user home directory
+  ansible.builtin.copy:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: /home/{{ ansible_user }}/.kube/config
+    owner: '{{ ansible_user }}'
+    group: '{{ ansible_user }}'
+    mode: '0600'
+  become: true
