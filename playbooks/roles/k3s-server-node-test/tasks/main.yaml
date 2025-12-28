@@ -44,3 +44,11 @@
     mode: '0600'
     remote_src: true
   become: true
+
+- name: Wait for K3s node to be Ready
+  ansible.builtin.shell: kubectl get nodes
+  register: result
+  retries: 10
+  delay: 10
+  until: "'Ready' in result.stdout"
+  become: true
