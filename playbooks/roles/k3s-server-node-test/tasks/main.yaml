@@ -2,3 +2,16 @@
   community.general.ufw:
     state: disabled
   become: true
+
+- name: Ensure curl is installed
+  ansible.builtin.package:
+    name: curl
+    state: present
+
+- name: Install K3s Server
+  ansible.builtin.shell: curl -sfL https://get.k3s.io | sh -s -
+  environment:
+    INSTALL_K3S_EXEC: 'server --disable traefik'
+    K3S_TOKEN: '{{ k3s_token }}'
+  args:
+    creates: /usr/local/bin/k3s
