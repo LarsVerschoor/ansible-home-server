@@ -2,3 +2,10 @@
   kubernetes.core.helm_repository:
     name: ingress-nginx
     repo_url: https://kubernetes.github.io/ingress-nginx
+
+- name: Create namespace for ingress-nginx
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: ingress-nginx
+    state: present
