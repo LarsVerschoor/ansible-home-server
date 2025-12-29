@@ -21,5 +21,6 @@
       - controller.service.type=NodePort
       - controller.replicaCount=3
       - controller.podAntiAffinity=hard
+    kubeconfig: /home/{{ ansible_user }}/.kube/config
     wait: true
     wait_timeout: 300
