@@ -5,6 +5,6 @@ all:
         servers:
           hosts:
             intel_nuc_1:
-              ansible_host: nuc-server.home
+              ansible_host: k3s-server-1.home
               ansible_user: larsv
               ansible_python_interpreter: /usr/bin/python3
