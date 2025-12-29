@@ -3,3 +3,25 @@
     url: https://get.helm.sh/helm-v4.0.4-linux-amd64.tar.gz
     dest: /tmp/helm-v4.0.4-linux-amd64.tar.gz
     mode: '0644'
+
+- name: Extract Helm
+  ansible.builtin.unarchive:
+    src: /tmp/helm-v4.0.4-linux-amd64.tar.gz
+    dest: /tmp/
+    remote_src: yes
+
+- name: Move Helm binary to bin directory
+  ansible.builtin.command:
+    cmd: mv /tmp/linux-amd64/helm /usr/local/bin/helm
+  args:
+    creates: /usr/local/bin/helm
+
+- name: Delete extracted files
+  ansible.builtin.file:
+    path: /tmp/linux-amd64
+    state: absent
+
+- name: Delete compressed helm binary
+  ansible.builtin.file:
+    path: /tmp/helm-v4.0.4-linux-amd64.tar.gz
+    state: absent
