@@ -10,3 +10,17 @@
     name: ingress-nginx
     state: present
     kubeconfig: /home/{{ ansible_user }}/.kube/config
+
+- name: Install Nginx Ingress controller using Helm
+  kubernetes.core.helm:
+    name: ingress-nginx
+    chart_ref: ingress-nginx/ingress-nginx
+    namespace: ingress-nginx
+    create_namespace: false
+    values:
+    set_values:
+      controller.service.type: NodePort
+      controller.replicaCount: 3
+      controller.podAntiAffinity: hard
+    wait: true
+    wait_timeout: 300
