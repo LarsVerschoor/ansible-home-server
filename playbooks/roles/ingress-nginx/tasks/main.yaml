@@ -9,3 +9,4 @@
     kind: Namespace
     name: ingress-nginx
     state: present
+    kubeconfig: /home/{{ ansible_user }}/.kube/config
