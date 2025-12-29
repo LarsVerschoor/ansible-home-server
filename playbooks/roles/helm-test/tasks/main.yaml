@@ -1,16 +1,21 @@
+- name: Check if Helm is already installed
+  ansible.builtin.stat:
+    path: /usr/local/bin/helm
+  register: helm_installed
+
 - name: Download Helm
   ansible.builtin.get_url:
     url: https://get.helm.sh/helm-v4.0.4-linux-amd64.tar.gz
     dest: /tmp/helm-v4.0.4-linux-amd64.tar.gz
     mode: '0644'
-    force: no
+  when: not helm_installed.stat.exists
 
 - name: Extract Helm
   ansible.builtin.unarchive:
     src: /tmp/helm-v4.0.4-linux-amd64.tar.gz
     dest: /tmp/
     remote_src: yes
-    creates: /tmp/linux-amd64/helm
+  when: not helm_installed.stat.exists and ansible.builtin.stat(path='/tmp/helm-v4.0.4-linux-amd64.tar.gz').stat.exists
 
 - name: Move Helm binary to bin directory
   ansible.builtin.command:
