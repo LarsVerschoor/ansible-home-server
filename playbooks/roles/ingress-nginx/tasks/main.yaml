@@ -24,5 +24,4 @@
         replicaCount: 3
         podAntiAffinity: hard
     kubeconfig: /home/{{ ansible_user }}/.kube/config
-    wait: true
-    wait_timeout: 300
+    timeout: 5m0s
