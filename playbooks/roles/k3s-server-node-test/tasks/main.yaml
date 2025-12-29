@@ -46,9 +46,11 @@
   become: true
 
 - name: Wait for K3s node to be Ready
-  ansible.builtin.shell: kubectl get nodes
+  ansible.builtin.command: kubectl get nodes --no-headers
   register: result
   retries: 10
   delay: 10
   until: "'Ready' in result.stdout"
   become: true
+  changed_when: false
+  failed_when: "'NotReady' in result.stdout"
