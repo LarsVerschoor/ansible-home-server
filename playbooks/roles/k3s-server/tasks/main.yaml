@@ -26,6 +26,24 @@
   args:
     creates: /usr/local/bin/k3s
 
+- name: Create k3s-readers group
+  ansible.builtin.group:
+    name: k3s-readers
+    state: present
+
+- name: Add ansible user to k3s-readers group
+  ansible.builtin.user:
+    name: "{{ ansible_user }}"
+    groups: k3s-readers
+    append: yes
+
+- name: Set kubeconfig group and permissions
+  ansible.builtin.file:
+    path: /etc/rancher/k3s/k3s.yaml
+    owner: root
+    group: k3s-readers
+    mode: '0640'
+
 - name: Create .kube directory on user home directory
   ansible.builtin.file:
     path: /home/{{ ansible_user }}/.kube
@@ -56,6 +74,5 @@
   retries: 10
   delay: 10
   until: "'Ready' in result.stdout"
-  become: true
   changed_when: false
   failed_when: "'NotReady' in result.stdout"
