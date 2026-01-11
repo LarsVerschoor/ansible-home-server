@@ -30,3 +30,4 @@
         podAntiAffinity: hard
     kubeconfig: /home/{{ ansible_user }}/.kube/config
     timeout: 5m0s
+    state: present
