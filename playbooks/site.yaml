@@ -8,4 +8,5 @@
     - k3s-server
     - helm
     - ingress-nginx
+    - cert-manager
     - longhorn
