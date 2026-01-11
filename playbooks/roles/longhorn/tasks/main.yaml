@@ -21,6 +21,12 @@
     kubeconfig: /home/{{ ansible_user }}/.kube/config
     state: present
 
+- name: Hash Longhorn basic-auth password
+  ansible.builtin.shell: |
+    printf "{{ longhorn_auth_user }}:$(openssl passwd -apr1 '{{ longhorn_auth_password }}')"
+  register: longhorn_basic_auth
+  no_log: true
+
 - name: Set up Longhorn basic-auth
   kubernetes.core.k8s:
     kubeconfig: /home/{{ ansible_user }}/.kube/config
@@ -33,7 +39,7 @@
         namespace: longhorn-system
       type: Opaque
       stringData:
-        auth: "{{ longhorn_auth_user }}:{{ longhorn_auth_password | password_hash('apr1') }}"
+        auth: '{{ longhorn_basic_auth.stdout }}'
 
 - name: Create Longhorn ingress with basic auth
   kubernetes.core.k8s:
