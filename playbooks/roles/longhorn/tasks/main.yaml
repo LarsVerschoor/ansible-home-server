@@ -61,11 +61,11 @@
       spec:
         tls:
           - hosts:
-              - longhorn.cluster
+              - longhorn.sys.larsverschoor.nl
             secretName: longhorn-tls
         ingressClassName: nginx
         rules:
-          - host: longhorn.cluster
+          - host: longhorn.sys.larsverschoor.nl
             http:
               paths:
                 - path: /
