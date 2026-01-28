@@ -20,14 +20,26 @@
     kubeconfig: /home/{{ ansible_user }}/.kube/config
     state: present
     wait: true
-    values:
-      server:
-        service:
-          type: ClusterIP
-          port: 80
-          targetPort: 8080
-        ingress:
-          enabled: false
+
+- name: Hash ArgoCD basic-auth password
+  ansible.builtin.shell: |
+    printf "{{ argocd_auth_user }}:$(openssl passwd -apr1 '{{ argocd_auth_password }}')"
+  register: argocd_basic_auth
+  no_log: true
+
+- name: Set up ArgoCD basic-auth
+  kubernetes.core.k8s:
+    kubeconfig: /home/{{ ansible_user }}/.kube/config
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: basic-auth
+        namespace: argocd
+      type: Opaque
+      stringData:
+        auth: '{{ argocd_basic_auth.stdout }}'
 
 - name: Create ArgoCD ingress with basic auth
   kubernetes.core.k8s:
