@@ -24,7 +24,8 @@
       server:
         service:
           type: ClusterIP
-        ingress: false
+        ingress:
+          enabled: false
 
 - name: Create ArgoCD ingress with basic auth
   kubernetes.core.k8s:
