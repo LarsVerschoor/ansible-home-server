@@ -9,6 +9,7 @@
     kind: Namespace
     name: argocd
     state: present
+    kubeconfig: /home/{{ ansible_user }}/.kube/config
 
 - name: Install ArgoCD using Helm
   kubernetes.core.helm:
@@ -16,6 +17,7 @@
     chart_ref: argocd/argocd
     namespace: argocd
     create_namespace: false
+    kubeconfig: /home/{{ ansible_user }}/.kube/config
     state: present
     wait: true
     values:
