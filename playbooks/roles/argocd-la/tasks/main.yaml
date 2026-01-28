@@ -20,6 +20,10 @@
     kubeconfig: /home/{{ ansible_user }}/.kube/config
     state: present
     wait: true
+    values:
+      server:
+        extraArgs:
+          - --insecure
 
 - name: Hash ArgoCD basic-auth password
   ansible.builtin.shell: |
@@ -54,6 +58,7 @@
         annotations:
           nginx.ingress.kubernetes.io/auth-type: basic
           nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+          nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
           nginx.ingress.kubernetes.io/auth-secret: basic-auth
           nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
           nginx.ingress.kubernetes.io/backend-protocol: 'HTTP'
