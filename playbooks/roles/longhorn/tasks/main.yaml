@@ -20,6 +20,7 @@
     create_namespace: false
     kubeconfig: /home/{{ ansible_user }}/.kube/config
     state: present
+    wait: true
 
 - name: Hash Longhorn basic-auth password
   ansible.builtin.shell: |

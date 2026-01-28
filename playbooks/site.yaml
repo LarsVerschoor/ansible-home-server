@@ -10,3 +10,4 @@
     - ingress-nginx
     - cert-manager
     - longhorn
+    - argocd-la

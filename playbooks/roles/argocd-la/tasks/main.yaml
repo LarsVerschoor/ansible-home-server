@@ -1,0 +1,29 @@
+- name: Add ArgoCD repository to Helm
+  kubernetes.core.helm_repository:
+    name: argocd
+    repo_url: https://github.com/argoproj/argo-helm
+
+- name: Create namespace for ArgoCD
+  kuberneters.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: argocd
+    state: present
+
+- name: Install ArgoCD using Helm
+  kubernetes.core.helm:
+    name: argocd
+    chart_ref: argocd/argocd
+    namespace: argocd
+    create_namespace: false
+    state: present
+    wait: true
+    values:
+      server:
+        service:
+          type: ClusterIP
+      ingress:
+        enabled: true
+        ingressClassName: nginx
+        hosts:
+          - argocd.sys.larsverschoor.nl
