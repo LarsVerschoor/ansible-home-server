@@ -14,7 +14,7 @@
 - name: Install ArgoCD using Helm
   kubernetes.core.helm:
     name: argocd
-    chart_ref: argocd/argocd
+    chart_ref: argocd
     namespace: argocd
     create_namespace: false
     kubeconfig: /home/{{ ansible_user }}/.kube/config
@@ -24,8 +24,8 @@
       server:
         service:
           type: ClusterIP
-      ingress:
-        enabled: true
-        ingressClassName: nginx
-        hosts:
-          - argocd.sys.larsverschoor.nl
+        ingress:
+          enabled: true
+          ingressClassName: nginx
+          hosts:
+            - argocd.sys.larsverschoor.nl
