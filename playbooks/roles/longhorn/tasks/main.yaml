@@ -75,4 +75,4 @@
                     service:
                       name: longhorn-frontend
                       port:
-                        number: 443
+                        number: 80
