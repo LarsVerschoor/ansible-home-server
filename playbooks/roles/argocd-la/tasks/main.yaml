@@ -1,7 +1,7 @@
 - name: Add ArgoCD repository to Helm
   kubernetes.core.helm_repository:
     name: argocd
-    repo_url: https://github.com/argoproj/argo-helm
+    repo_url: https://argoproj.github.io/argo-helm
 
 - name: Create namespace for ArgoCD
   kubernetes.core.k8s:
