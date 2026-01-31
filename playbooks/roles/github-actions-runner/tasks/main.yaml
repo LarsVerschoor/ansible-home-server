@@ -7,7 +7,7 @@
     state: present
     kubeconfig: /home/{{ ansible_user }}/.kube/config
 
-- name: namespace for GitHub ARC
+- name: Create namespace for GitHub ARC
   kubernetes.core.k8s:
     api_version: v1
     kind: Namespace
@@ -19,7 +19,7 @@
   kubernetes.core.helm:
     name: "arc-runner-{{ item | lower | replace('_','-') }}"
     chart_ref: oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set
-    release_namespace: arc-runners
+    release_namespace: arc-runner-set
     create_namespace: false
     state: present
     kubeconfig: /home/{{ ansible_user }}/.kube/config
