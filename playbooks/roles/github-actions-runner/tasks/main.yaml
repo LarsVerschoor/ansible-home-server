@@ -5,3 +5,4 @@
     release_namespace: 'arc-systems'
     create_namespace: true
     state: present
+    kubeconfig: /home/{{ ansible_user }}/.kube/config
