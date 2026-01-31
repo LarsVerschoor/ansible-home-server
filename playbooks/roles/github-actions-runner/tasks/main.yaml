@@ -1,0 +1,7 @@
+- name: Install ARC runner scale set controller
+  kubernetes.core.helm:
+    name: arc
+    chart_ref: oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller
+    release_namespace: 'arc-systems'
+    create_namespace: true
+    state: present
