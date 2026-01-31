@@ -6,3 +6,17 @@
     create_namespace: true
     state: present
     kubeconfig: /home/{{ ansible_user }}/.kube/config
+
+- name: Install GitHub Actions runner scale set
+  kubernetes.core.helm:
+    name: arc-runner-set
+    chart_ref: oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set
+    release_namespace: arc-runners
+    create_namespace: true
+    state: present
+    kubeconfig: /home/{{ ansible_user }}/.kube/config
+
+    values:
+      githubConfigUrl: 'https://github.com/<your_enterprise/org/repo>'
+      githubConfigSecret:
+        github_token: '{{ github_pat }}'
