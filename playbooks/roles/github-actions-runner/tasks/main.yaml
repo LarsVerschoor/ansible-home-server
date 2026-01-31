@@ -19,6 +19,7 @@
   kubernetes.core.k8s:
     state: present
     namespace: arc-runner-set
+    create_namespace: false
     kubeconfig: /home/{{ ansible_user }}/.kube/config
     definition:
       apiVersion: actions.github.com/v1alpha1
@@ -26,7 +27,7 @@
       metadata:
         name: 'runner-{{ item }}'
       spec:
-        githubConfigUrl: '{{ item }}'
+        githubConfigUrl: 'https://github.com/LarsVerschoor/{{ item }}'
         githubConfigSecret:
           github_token: '{{ github_pat }}'
         runnerScaleSetName: 'runner-{{ item }}'
