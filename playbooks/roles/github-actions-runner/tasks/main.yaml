@@ -11,6 +11,7 @@
   kubernetes.core.k8s:
     state: present
     namespace: arc-runners
+    kubeconfig: /home/{{ ansible_user }}/.kube/config
     definition:
       apiVersion: actions.github.com/v1alpha1
       kind: RunnerScaleSet
