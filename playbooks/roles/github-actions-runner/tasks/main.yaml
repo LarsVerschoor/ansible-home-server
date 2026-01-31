@@ -7,10 +7,18 @@
     state: present
     kubeconfig: /home/{{ ansible_user }}/.kube/config
 
+- name: namespace for GitHub ARC
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: arc-runner-set
+    state: present
+    kubeconfig: /home/{{ ansible_user }}/.kube/config
+
 - name: Create ARC RunnerScaleSets for all CI/CD repositories
   kubernetes.core.k8s:
     state: present
-    namespace: arc-runners
+    namespace: arc-runner-set
     kubeconfig: /home/{{ ansible_user }}/.kube/config
     definition:
       apiVersion: actions.github.com/v1alpha1
