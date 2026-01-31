@@ -15,21 +15,17 @@
     state: present
     kubeconfig: /home/{{ ansible_user }}/.kube/config
 
-- name: Create ARC RunnerScaleSets for all CI/CD repositories
-  kubernetes.core.k8s:
+- name: Install GitHub Actions runner scale set
+  kubernetes.core.helm:
+    name: "arc-runner-{{ item | lower | replace('_','-') }}"
+    chart_ref: oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set
+    release_namespace: arc-runners
+    create_namespace: false
     state: present
-    namespace: arc-runner-set
     kubeconfig: /home/{{ ansible_user }}/.kube/config
-    definition:
-      apiVersion: actions.github.com/v1alpha1
-      kind: RunnerScaleSet
-      metadata:
-        name: 'runner-{{ item }}'
-      spec:
-        githubConfigUrl: 'https://github.com/LarsVerschoor/{{ item }}'
-        githubConfigSecret:
-          github_token: '{{ github_pat }}'
-        runnerScaleSetName: 'runner-{{ item }}'
-        minRunners: 0
-        maxRunners: 2
+
+    values:
+      githubConfigUrl: 'https://github.com/LarsVerschoor/{{ item }}'
+      githubConfigSecret:
+        github_token: '{{ github_pat }}'
   loop: '{{ cicd_repositories }}'
