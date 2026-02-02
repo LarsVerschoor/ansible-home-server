@@ -81,3 +81,27 @@
                       name: argocd-server
                       port:
                         number: 80
+
+- name: Create Argo CD GitHub repo credential
+  kubernetes.core.k8s:
+    state: present
+    namespace: argocd
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: gitops-repo-credentials
+        labels:
+          argocd.argoproj.io/secret-type: repository
+      stringData:
+        url: 'https://github.com/LarsVerschoor/GitOps'
+        username: '{{ github_username }}'
+        password: '{{ github_pat }}'
+
+- name: Apply all Argo CD Applications
+  kubernetes.core.k8s:
+    state: present
+    namespace: argocd
+    src: '{{ item.path }}'
+  with_filetree: argocd/applications
+  when: item.state == 'file'
