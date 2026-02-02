@@ -95,7 +95,7 @@
         labels:
           argocd.argoproj.io/secret-type: repository
       stringData:
-        url: 'https://github.com/LarsVerschoor/GitOps'
+        url: 'https://github.com/LarsVerschoor/GitOps.git'
         username: '{{ github_username }}'
         password: '{{ github_pat }}'
 
