@@ -86,6 +86,7 @@
   kubernetes.core.k8s:
     state: present
     namespace: argocd
+    kubeconfig: /home/{{ ansible_user }}/.kube/config
     definition:
       apiVersion: v1
       kind: Secret
@@ -100,6 +101,7 @@
 
 - name: Apply all Argo CD Applications
   kubernetes.core.k8s:
+    kubeconfig: /home/{{ ansible_user }}/.kube/config
     state: present
     namespace: argocd
     src: '{{ item.path }}'
